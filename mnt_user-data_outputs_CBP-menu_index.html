@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="is-loading">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>菜單 Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7eddd; --ink:#3e210f; --muted:#725c49; --line:#d4bf98; --accent:#5a3418; --teal:#935f37; --rule:#c0a06a; --card:#f6f0e1; --veg:#3aa68d; --gutter:1.4rem; --pf:1rem;
+    --body:Helvetica,"Helvetica Neue",Arial,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    --head-en:Montserrat,"Noto Sans TC",Helvetica,Arial,sans-serif;
+    --head-zh:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:7rem;-webkit-text-size-adjust:100%;font-size:clamp(13px,calc(min(100vw,480px)*.041),19px)}
+  html{background:#ddd2bb}
+  body{margin:0 auto;max-width:480px;min-height:100vh;box-shadow:0 0 0 1px var(--line);background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:400;line-height:1.6}
+  header{background:var(--teal);color:#fff}
+  .hin{padding:1.5rem var(--gutter);display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center}
+  .hin > div:first-child{grid-column:2}
+  .hin .lang{grid-column:3;justify-self:end}
+  h1,h2{font-weight:700}
+  html[lang="en"] h1,html[lang="en"] h2{font-family:var(--head-en)}
+  html[lang="zh-Hant"] h1,html[lang="zh-Hant"] h2{font-family:var(--head-zh)}
+  h1{font-size:1.9rem;margin:0;line-height:1.2}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .logo{display:block;height:3.6rem;width:auto;margin:0 auto}
+  .sub{color:#e3ecea;font-size:.95rem;margin-top:6px}
+  .lang{display:flex;border:1.5px solid #fff;border-radius:999px;overflow:hidden;flex-shrink:0}
+  .lang button{border:0;background:transparent;color:#fff;padding:.35rem .6rem;font:400 .8rem var(--body);cursor:pointer}
+  .lang button[aria-pressed="true"]{background:#fff;color:var(--accent)}
+  .lang button:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+  nav a:focus-visible{outline:3px solid var(--ink);outline-offset:1px}
+  nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+  nav div{display:flex;gap:.5rem;overflow-x:auto;padding:.75rem var(--gutter);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  nav div::-webkit-scrollbar{display:none}
+  nav div{cursor:grab;user-select:none;-webkit-user-select:none;overscroll-behavior-x:contain}
+  nav div.dragging{cursor:grabbing}
+  nav a{-webkit-user-drag:none}
+  nav::after{content:"";position:absolute;top:0;right:0;bottom:0;width:2rem;background:linear-gradient(to right,rgba(247,237,221,0),var(--bg));pointer-events:none}
+  nav a{flex:0 0 auto;white-space:nowrap;line-height:1.4;text-decoration:none;color:var(--ink);padding:.4rem .9rem;border:1px solid var(--line);border-radius:999px;font-size:.9rem;background:var(--card)}
+  main{padding:.5rem var(--gutter) 3.5rem}
+  section{margin-top:2rem}
+  h2{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:1.2rem;margin:0 0 .4rem;padding-bottom:.5rem;border-bottom:2px solid var(--rule)}
+  .item{display:flex;justify-content:space-between;gap:.5rem;padding:.9rem 0;border-bottom:1px solid var(--line)}
+  .name{font-weight:400;font-size:1rem}
+  .item > div:first-child{flex:1;min-width:0}
+  .nm{white-space:nowrap}
+  .desc{color:var(--muted);font-size:.88rem;margin-top:.125rem}
+  .banner{background:var(--accent);color:#fff;overflow:hidden;white-space:nowrap;font-size:.92rem;line-height:1.2}
+  .banner[hidden]{display:none}
+  .banner .track{display:flex;width:max-content;padding:.65rem 0;animation:marquee 20s linear infinite}
+  .banner .grp{display:flex;flex-shrink:0}
+  .banner .unit{padding-right:3rem}
+  .banner:hover .track,.banner:active .track{animation-play-state:paused}
+  @keyframes marquee{to{transform:translateX(-50%)}}
+  @media (prefers-reduced-motion:reduce){
+    .banner{white-space:normal;text-align:center}
+    .banner .track{animation:none;width:auto;display:block;padding:.65rem var(--gutter)}
+    .banner .grp+.grp{display:none}
+    .banner .unit{padding:0}
+  }
+  /* 按鈕裡的中文：改用中文字型優先，避免被 Helvetica 的行高擠到偏上或偏下 */
+  html .lang button{font-family:var(--head-zh);line-height:1.3}
+  html[lang="zh-Hant"] nav a{font-family:var(--head-zh)}
+  nav a{display:inline-flex;align-items:center;justify-content:center;line-height:1.3}
+  html.is-loading{overflow:hidden}
+  .splash{position:fixed;inset:0;z-index:1000;background:var(--teal);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(56px,13vh,120px);transition:opacity .35s ease,visibility .35s;animation:splashOut .01s linear 9s forwards}
+  .splash.gone{opacity:0;visibility:hidden}
+  .splash-logo{display:block;width:min(46vw,190px);height:auto;margin-top:-6vh}
+  .splash p{margin:0;font-weight:700;font-size:1rem;letter-spacing:.08em;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.55}}
+  @keyframes splashOut{to{opacity:0;visibility:hidden}}
+  @media (prefers-reduced-motion:reduce){.splash p{animation:none}}
+  .desc.mid{display:block;margin:1px 0 0;line-height:1.4}
+  .inl{color:var(--muted);font-size:.8rem;margin-left:.3rem;white-space:nowrap}
+  .price{font-family:Helvetica,"Helvetica Neue",Arial,sans-serif;font-weight:400;font-size:var(--pf);color:var(--accent);white-space:nowrap}
+  .multi{display:flex;flex-shrink:0}
+  .multi span,.cols span{display:block;width:2.5rem}  /* 實際寬度由程式依價格位數計算 */
+  .multi span{text-align:right}
+  .cols span{text-align:center}
+  .multi span+span,.cols span+span{margin-left:.7rem}
+  .cols{display:flex;flex-shrink:0;color:var(--ink);font:700 .85rem var(--body)}
+  .subhead{margin-top:1.25rem;padding-bottom:.125rem;color:var(--accent);font-weight:700;font-size:.95rem}
+  html[lang="en"] .subhead{font-family:var(--head-en);font-size:.85rem}
+  .tag{display:inline-block;margin-left:.4rem;font-size:.72rem;font-weight:400;color:#fff;background:var(--veg);border-radius:.25rem;padding:.06rem .45rem;vertical-align:middle}
+  .zhn{display:block;font-size:.9rem;line-height:1.4;color:#4d4d47;margin-top:1px}
+  html[lang="en"] .tag{display:table;margin:.3rem 0 0}
+  .item.sep{margin-top:.9rem;border-top:1px dashed var(--line)}
+  .item.far{margin-top:2.75rem}
+  .box{margin-top:1.4rem;padding:.1rem 1.1rem .25rem;border:1.5px solid var(--rule);border-radius:1.1rem;background:rgba(192,160,106,.28)}
+  .box .item:last-child{border-bottom:0}
+  .box .subhead{margin-top:.9rem}
+  footer{padding:0 var(--gutter) 2.5rem;color:var(--muted);font-size:.85rem;text-align:center}
+  /* ---- 柔光半透明按鈕：頂部按鈕 ---- */
+  nav{background:var(--bg);background:color-mix(in srgb,var(--bg) 60%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid rgba(255,255,255,.4);box-shadow:none}
+  nav::after{display:none}
+  nav div{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 1.4rem),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 1.4rem),transparent)}
+  nav a{color:var(--ink);font-weight:500;background:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),inset 0 1px 8px rgba(255,255,255,.35);transition:background .15s ease}
+  nav a:active{background:rgba(255,255,255,.5)}
+  .lang{padding:2px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  .lang button{border-radius:999px;color:#fff;font-weight:500;text-shadow:none}
+  .lang button[aria-pressed="true"]{color:var(--accent);background:rgba(255,255,255,.88);box-shadow:inset 0 0 6px rgba(255,255,255,.6)}
+</style>
+</head>
+<body>
+
+<div id="splash" class="splash" role="status" aria-live="polite"><img class="splash-logo" src="data:image/png;base64,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" alt="Premium Café Bambino 貝比諾咖啡"><p id="splashText"></p></div>
+<div id="banner" class="banner" hidden><div class="track"></div></div>
+<header><div class="hin">
+  <div>
+    <img class="logo" src="data:image/png;base64,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" alt="Premium Café Bambino 貝比諾咖啡">
+    <h1 id="title" class="sr"></h1>
+  </div>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="zh" aria-pressed="true">中文</button>
+    <button type="button" data-lang="en" aria-pressed="false">English</button>
+  </div>
+</div></header>
+<nav><div id="nav"></div></nav>
+<main id="menu"></main>
+<footer id="note"></footer>
+
+<script>
+/* ============================================================
+   ✏️ 只需要修改這個區塊 / Edit only this block
+   - zh = 中文、en = English
+   - price 填數字即可；tag 可留空(例如 "辣" / "Spicy")
+   - 下面是「範例」，請換成你自己的菜單
+   ============================================================ */
+const CONFIG = {
+  "title": {
+    "zh": "Premium 貝比諾咖啡",
+    "en": "Premium Café Bambino"
+  },
+  "note": {
+    "zh": "如有食物過敏，請告知店員。",
+    "en": "Please tell our staff about any food allergies."
+  },
+  "currency": "$",
+  "categories": [
+    {
+      "name": {
+        "zh": "咖啡",
+        "en": "Coffee"
+      },
+      "items": [
+        {
+          "zh": "美式咖啡",
+          "en": "Americano",
+          "price": 55,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "拿鐵咖啡",
+          "en": "Latte",
+          "price": 65,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "卡布奇諾",
+          "en": "Cappuccino",
+          "price": 65,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "焦糖拿鐵",
+          "en": "Caramel Latte",
+          "price": 75,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "焦糖瑪奇朵",
+          "en": "Caramel Macchiato",
+          "price": 75,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "榛果拿鐵",
+          "en": "Hazelnut Latte",
+          "price": 75,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "杏仁咖啡",
+          "en": "Almond Coffee",
+          "price": 80,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "精品美式咖啡",
+          "en": "Premium Americano",
+          "price": 80,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "精品拿鐵",
+          "en": "Premium Latte",
+          "price": 90,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        }
+      ]
+    },
+    {
+      "name": {
+        "zh": "茶飲",
+        "en": "Tea"
+      },
+      "items": [
+        {
+          "zh": "極品紅茶",
+          "en": "Premium Black Tea",
+          "price": 35,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "極品烏龍",
+          "en": "Premium Oolong Tea",
+          "price": 35,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "紅茶拿鐵",
+          "en": "Black Tea Latte",
+          "price": 45,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "烏龍拿鐵",
+          "en": "Oolong Tea Latte",
+          "price": 45,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "玄米綠茶",
+          "en": "Genmaicha Green Tea",
+          "price": 50,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "抹茶黑豆玄米茶",
+          "en": "Matcha Grain Tea",
+          "price": 50,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "杏仁鮮奶",
+          "en": "Almond Milk",
+          "price": 65,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "阿華田拿鐵",
+          "en": "Ovaltine Latte",
+          "price": 65,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "抹茶黑豆玄米拿鐵",
+          "en": "Matcha Grain Latte",
+          "price": 65,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        }
+      ]
+    },
+    {
+      "name": {
+        "zh": "特調茶",
+        "en": "Flavored Special Teas"
+      },
+      "items": [
+        {
+          "zh": "桂圓紅棗茶",
+          "en": "Longan & Red Date Tea",
+          "price": 50,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "金萱茶",
+          "en": "Jin Xuan Oolong Tea",
+          "price": 60,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "黑醋栗果茶",
+          "en": "Blackcurrant Fruit Tea",
+          "price": 65,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        },
+        {
+          "zh": "黃金柚子茶",
+          "en": "Golden Yuzu Tea",
+          "price": 80,
+          "descZh": "冰/熱",
+          "descEn": "Hot/Iced",
+          "inl": true
+        }
+      ]
+    },
+    {
+      "name": {
+        "zh": "即食餐點",
+        "en": "Ready-to-Eat Meals"
+      },
+      "items": [
+        {
+          "zh": "三杯雞米漢堡",
+          "en": "Three-Cup Chicken Rice Burger",
+          "price": 70
+        },
+        {
+          "zh": "洋蔥豬米漢堡",
+          "en": "Onion Pork Rice Burger",
+          "price": 70
+        },
+        {
+          "zh": "日式牛丼米漢堡",
+          "en": "Japanese Beef Bowl Rice Burger",
+          "price": 70
+        },
+        {
+          "zh": "鮭魚炒飯",
+          "en": "Salmon Fried Rice",
+          "price": 75
+        },
+        {
+          "zh": "麻油雞炒飯",
+          "en": "Sesame Oil Chicken Fried Rice",
+          "price": 75
+        },
+        {
+          "zh": "奶油培根義大利麵",
+          "en": "Creamy Bacon Spaghetti",
+          "price": 75
+        },
+        {
+          "zh": "墨西哥嫩雞飯",
+          "en": "Mexican Spiced Chicken Rice",
+          "price": 85
+        }
+      ]
+    },
+    {
+      "name": {
+        "zh": "厚片/輕食",
+        "en": "Toast / Light Snacks"
+      },
+      "items": [
+        {
+          "zh": "香蒜厚片",
+          "en": "Garlic Thick Toast",
+          "price": 35
+        },
+        {
+          "zh": "起司厚片",
+          "en": "Cheese Thick Toast",
+          "price": 35
+        },
+        {
+          "zh": "奶油厚片",
+          "en": "Butter Thick Toast",
+          "price": 35
+        },
+        {
+          "zh": "奶酥厚片",
+          "en": "Milk Spread Thick Toast",
+          "price": 35
+        },
+        {
+          "zh": "巧克力厚片",
+          "en": "Chocolate Thick Toast",
+          "price": 35
+        },
+        {
+          "zh": "花生厚片",
+          "en": "Peanut Butter Thick Toast",
+          "price": 35
+        },
+        {
+          "zh": "柚香厚片",
+          "en": "Citrus Yuzu Thick Toast",
+          "price": 35
+        },
+        {
+          "zh": "鮪魚厚片",
+          "en": "Tuna Thick Toast",
+          "price": 45
+        },
+        {
+          "zh": "鮪魚起司",
+          "en": "Tuna & Cheese Toast",
+          "price": 50
+        }
+      ]
+    }
+  ]
+};
+/* ============================================================ */
+
+/* ============================================================
+   🔗 Google 試算表連動
+   把試算表「發布到網路」(CSV) 的網址貼在下面的引號裡。
+   留空 = 只使用上面內建的菜單。
+   ============================================================ */
+/* 即時讀取（優先使用）：試算表「一般存取權」需為「知道連結的任何人－檢視者」 */
+const SHEET_LIVE_CSV_URL = "https://docs.google.com/spreadsheets/d/15rACnz63nLBlESu2jx-zSkipeMI4541gjqS3PRzIADc/gviz/tq?tqx=out:csv&sheet=CBP&headers=1";
+/* 備用：「發布到網路」的 CSV 網址（即時讀取失敗時才使用） */
+const SHEET_CSV_URL = "";
+
+
+const T0 = Date.now();
+function hideSplash(){
+  const sp = document.getElementById("splash");
+  if (sp.classList.contains("gone")) return;
+  setTimeout(() => { sp.classList.add("gone"); document.documentElement.classList.remove("is-loading"); },
+             Math.max(0, 700 - (Date.now() - T0)));
+}
+
+let lang = "zh";
+try {
+  const saved = localStorage.getItem("menu-lang");
+  if (saved === "zh" || saved === "en") lang = saved;
+  else lang = (navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en";
+} catch (e) {
+  lang = (navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en";
+}
+
+function money(p){ return /^[\d.,]+$/.test(String(p)) ? CONFIG.currency + p : String(p); }
+function esc(s){return String(s ?? "").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function itemHtml(it, L, D, w){
+  return `
+        ${it.sub ? `<div class="subhead">${esc(it.sub[L])}</div>` : ""}
+        <div class="item${it.sep ? " sep" : ""}${it.far ? " far" : ""}">
+          <div>
+            <div class="name"><span class="nm">${esc(it[L])}</span>${it.inl && it["desc"+D] ? `<span class="inl">${esc(it["desc"+D])}</span>` : ""}${L === "en" && it.up && it["desc"+D] && !it.inl ? `<span class="desc mid">${esc(it["desc"+D])}</span>` : ""}${L === "en" ? `<span class="zhn">${esc(it.zh)}</span>` : ""}${it.veg ? `<span class="tag">${L === "zh" ? "素食" : "Vegetarian"}</span>` : ""}</div>
+            ${it["desc"+D] && !it.inl && !(it.up && L === "en") ? `<div class="desc">${esc(it["desc"+D])}</div>` : ""}
+          </div>
+          ${it.prices ? `<div class="price multi">${it.prices.map((p,j)=>`<span${w && w[j] ? ` style="width:calc(var(--pf)*${w[j]})"` : ""}>${p == null ? "" : esc(money(p))}</span>`).join("")}</div>` : `<div class="price">${it.price == null || it.price === "" ? "" : esc(money(it.price))}</div>`}
+        </div>`;
+}
+function itemsHtml(items, L, D, w){
+  let out = "", i = 0;
+  while (i < items.length) {
+    if (items[i].box) {
+      let g = "";
+      while (i < items.length && items[i].box) { g += itemHtml(items[i], L, D, w); i++; }
+      out += `<div class="box">${g}</div>`;
+    } else { out += itemHtml(items[i], L, D, w); i++; }
+  }
+  return out;
+}
+
+function colWidths(c, L){
+  if (!c.cols) return null;
+  return c.cols[L].map((_, j) => {
+    const mx = Math.max(2, ...c.items.map(it => it.prices && it.prices[j] != null ? money(it.prices[j]).length : 0));
+    return +(mx * 0.56 + 0.1).toFixed(2);
+  });
+}
+function fitNames(){
+  document.querySelectorAll(".name").forEach(n => {
+    const nm = n.querySelector(".nm"); if (!nm) return;
+    nm.style.fontSize = ""; nm.style.whiteSpace = "nowrap";
+    const avail = n.clientWidth, w = nm.getBoundingClientRect().width;
+    if (!avail || w <= avail) return;
+    const k = avail / w;
+    if (k >= 0.78) nm.style.fontSize = (k * 0.98 * 100).toFixed(1) + "%";
+    else { nm.style.fontSize = "80%"; nm.style.whiteSpace = "normal"; }
+  });
+}
+function render(){
+  const L = lang, D = L === "zh" ? "Zh" : "En";
+  document.documentElement.lang = L === "zh" ? "zh-Hant" : "en";
+  document.title = CONFIG.title[L] + (L === "zh" ? " 菜單" : " Menu");
+  document.getElementById("title").textContent = CONFIG.title[L];
+  document.getElementById("note").textContent = CONFIG.note[L];
+
+  document.querySelectorAll(".lang button").forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.lang === L ? "true" : "false"));
+
+  if (!ready) {
+    document.getElementById("nav").innerHTML = "";
+    document.getElementById("menu").innerHTML = "";
+    document.getElementById("splashText").textContent = L === "zh" ? "菜單載入中…" : "Loading menu…";
+    return;
+  }
+  hideSplash();
+
+  const banner = document.getElementById("banner");
+  const msgs = (CONFIG.announcements || []).map(a => a[L]).filter(Boolean);
+  if (!msgs.length) { banner.hidden = true; }
+  else {
+    const track = banner.firstElementChild;
+    const unit = `<span class="unit">${esc(msgs.join("　•　"))}</span>`;
+    track.innerHTML = `<div class="grp">${unit}</div>`;
+    banner.hidden = false;
+    const g = track.firstElementChild;
+    for (let n = 1; g.scrollWidth < banner.clientWidth * 1.2 && n < 12; n++) g.insertAdjacentHTML("beforeend", unit);
+    track.insertAdjacentHTML("beforeend", g.outerHTML);
+    track.style.animationDuration = Math.max(10, g.scrollWidth / 55) + "s";
+  }
+
+  document.getElementById("nav").innerHTML = CONFIG.categories
+    .map((c,i)=>`<a href="#cat${i}">${esc(c.name[L])}</a>`).join("");
+
+  document.getElementById("menu").innerHTML = CONFIG.categories.map((c,i)=>`
+    <section id="cat${i}">
+      <h2><span>${esc(c.name[L])}</span>${c.cols ? `<span class="cols">${c.cols[L].map((x,j)=>`<span style="width:calc(var(--pf)*${colWidths(c,L)[j]})">${esc(x)}</span>`).join("")}</span>` : ""}</h2>
+      ${itemsHtml(c.items, L, D, colWidths(c, L))}
+    </section>`).join("");
+  fitNames();
+}
+
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => {
+  lang = b.dataset.lang;
+  try { localStorage.setItem("menu-lang", lang); } catch (e) {}
+  render();
+}));
+
+/* 分類按鈕：手機可直接左右滑動；電腦可用滑鼠拖曳或滾輪 */
+(function(){
+  const bar = document.getElementById("nav");
+  let down = false, moved = false, startX = 0, startLeft = 0;
+  bar.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse") return;
+    down = true; moved = false; startX = e.clientX; startLeft = bar.scrollLeft;
+  });
+  window.addEventListener("pointermove", e => {
+    if (!down) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 4) { moved = true; bar.classList.add("dragging"); }
+    bar.scrollLeft = startLeft - dx;
+  });
+  window.addEventListener("pointerup", () => { down = false; bar.classList.remove("dragging"); });
+  bar.addEventListener("click", e => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  bar.addEventListener("wheel", e => {
+    if (bar.scrollWidth <= bar.clientWidth) return;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { bar.scrollLeft += e.deltaY; e.preventDefault(); }
+  }, { passive: false });
+})();
+
+/* ---------- 讀取 Google 試算表 ---------- */
+function parseCSV(text){
+  const rows = []; let row = [], cur = "", q = false;
+  text = text.replace(/^\uFEFF/, "");
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(cur); cur = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i+1] === "\n") i++; row.push(cur); cur = ""; rows.push(row); row = []; }
+    else cur += c;
+  }
+  if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+function buildFromRows(rows){
+  const cats = [], map = {}, ann = [];
+  const P = v => { v = (v || "").trim().replace(/^\$\s*/, ""); return v === "" ? null : v; };
+  const split = v => v.split(/[|｜/、,，]/).map(x => x.trim());
+  rows.slice(1).forEach(r => {
+    const [catZh, catEn, zh, en, p1, p2, dZh, dEn, hide, style, colsZh, colsEn, subZh, subEn] = r.map(x => (x || "").trim());
+    if (!catZh && !catEn) return;
+    if (/^(公告|跑馬燈|announcement|marquee)$/i.test(catZh) || /^(announcement|marquee)$/i.test(catEn)) {
+      if ((zh || en) && /^(顯示|显示|show|y|yes|是|1|true)$/i.test(hide)) ann.push({ zh: zh || en, en: en || zh });   // 公告：要明確選「顯示」才會出現
+      return;
+    }
+    const key = catZh + "|" + catEn;
+    let c = map[key];
+    if (!c) { c = map[key] = { name: { zh: catZh || catEn, en: catEn || catZh }, items: [] }; cats.push(c); }
+    if (colsZh || colsEn) c.cols = { zh: split(colsZh || colsEn), en: split(colsEn || colsZh) };
+    if (!zh && !en) return;
+    if (/^(n|no|否|x|隱藏|隐藏|hide|false|0)$/i.test(hide)) return;
+    const it = { zh: zh || en, en: en || zh };
+    if (dZh) it.descZh = dZh;
+    if (dEn) it.descEn = dEn;
+    if (style.includes("素食")) it.veg = true;
+    if (style.includes("內嵌")) it.inl = true;
+    if (style.includes("分隔")) it.sep = true;
+    if (style.includes("拉開")) { it.sep = true; it.far = true; }
+    if (style.includes("框")) it.box = true;
+    if (style.includes("說明在上")) it.up = true;
+    if (subZh || subEn) it.sub = { zh: subZh || subEn, en: subEn || subZh };
+    if (c.cols) it.prices = [P(p1), P(p2)]; else it.price = P(p1);
+    c.items.push(it);
+  });
+  return { cats: cats.filter(c => c.items.length), ann };
+}
+let ready = !(SHEET_LIVE_CSV_URL || SHEET_CSV_URL);   // 連動試算表時，先等讀到最新資料再顯示價格
+async function fetchCats(url){
+  const r = await fetch(url + (url.includes("?") ? "&" : "?") + "_=" + Date.now(), { cache: "no-store" });
+  if (!r.ok) throw new Error(r.status);
+  const text = await r.text();
+  if (/^\s*</.test(text)) throw new Error("not csv");        // 讀到登入頁或錯誤頁
+  const rows = parseCSV(text);
+  if (!rows[0] || rows[0].length < 9) throw new Error("bad header");
+  const res = buildFromRows(rows);
+  if (!res.cats.length) throw new Error("empty");
+  return res;
+}
+async function loadSheet(){
+  const urls = [SHEET_LIVE_CSV_URL, SHEET_CSV_URL].filter(Boolean);
+  if (!urls.length) return;
+  const apply = res => {
+    CONFIG.categories = res.cats; CONFIG.announcements = res.ann;
+    try { localStorage.setItem("menu-sheet-cache-cbp", JSON.stringify({ c: res.cats, a: res.ann })); } catch (e) {}
+    ready = true; render();
+  };
+  const fallback = () => {            // 都讀不到：用上次成功的資料，再不行用內建菜單
+    if (ready) return;
+    try {
+      const c = JSON.parse(localStorage.getItem("menu-sheet-cache-cbp") || "null");
+      if (c && c.c && c.c.length) { CONFIG.categories = c.c; CONFIG.announcements = c.a || []; }
+    } catch (e) {}
+    ready = true; render();
+  };
+  const timer = setTimeout(fallback, 5000);
+  for (const u of urls) {
+    try { const res = await fetchCats(u); clearTimeout(timer); apply(res); return; } catch (e) {}
+  }
+  clearTimeout(timer); fallback();
+}
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitNames);
+window.addEventListener("resize", fitNames);
+loadSheet();
+render();
+</script>
+</body>
+</html>
